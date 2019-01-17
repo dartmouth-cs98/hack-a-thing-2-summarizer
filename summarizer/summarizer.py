@@ -17,7 +17,7 @@ async def connect(sid, environ):
     print("connected: ", sid)
     await sio.emit('connect', "connected")
 
-# Summarize a csv path
+# Summarize a csv cle
 @sio.on('summarize_csv')
 async def summarize_csv(sid, data):
 
@@ -25,8 +25,10 @@ async def summarize_csv(sid, data):
     summary_results = summarizer.summarize_csv_wrapper(sid, data)
     
     # Build results
+    data = json.loads(data)
     result_obj = {}
     result_obj['result'] = summary_results
+    result_obj['jobId'] = data['job']
     result_str = json.dumps(result_obj)
 
     # Send results to client

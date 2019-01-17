@@ -103,12 +103,34 @@ class GTSummarizer():
         results = []
         for i in range(topN):
             results.append(ranked_sentences[i])
-        return results
+
+        # Sort by occurence in text
+        # sorted_results = []
+        # for i in results:
+        #     occurence_index = sentences.index(i[1])
+        #     sorted_results.append((occurence_index, i))
+
+        # sorted_results = sorted(sorted_results, key=lambda x: x[0])
+        # sorted_results = [x[1] for x in sorted_results]
+
+        # Build data object
+        summaries = []
+        for x in results:
+            summary = {}
+            summary["sentenceIndex"] = sentences.index(x[1])
+            summary["confidence"] = x[0]
+            summary["summary"] = x[1]
+            summaries.append(summary)
+        
+        return summaries
 
 
     def summarize_csv_wrapper(self, sid, message):
         print("Received request")
         data = json.loads(message)
         results = self.summarize_csv(data['fileName'], data['textFieldName'])
+        print("Summaries computed")
         return results
 
+# x = GTSummarizer()
+# x.summarize_csv("./data/tennis_articles_v4.csv", "article_text")

@@ -1,3 +1,4 @@
 glove*
 venv
 tmp/
+*npm_modules*
