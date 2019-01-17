@@ -12,4 +12,6 @@ I learned about writing ML algorithms from scratch, albeit quite simple and from
 Using Redis allows for really efficient and clean distributed computing for CPU intensive tasks. I would like to have a strong distributed element to my project and Redis will likely be key.
 
 ## What didn’t work
+The original idea was to have Python work on a redis queue. So it would poll a piece of work (text) and then use the Summarizer instance to process it. There would be an independent Node server set up to create records in the redis queue (via API) and would have a callback on completion of the task. However, I had a hard time getting Redis interopting with my Node code. As such, I very hackily threw together an intermediate Node layer that communicates via sockets to the Python summarizer. Essentially, it reads work from a queue, passes the work to Python, and once Python finishes, the Node intermediate layer updates the Redis task as complete - triggering the independent Node server to invoke it's completion callback. In essence, the user story is the exact same, it's just hacky/unscalable right now.
+
 I really wanted to get a POST route set up instead of the current solution (modifying the text field of a CSV file on the machine). However, it will be an easy addition at a later date
