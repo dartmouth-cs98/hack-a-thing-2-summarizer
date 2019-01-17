@@ -10,14 +10,16 @@ from nltk.corpus import stopwords
 from sklearn.metrics.pairwise import cosine_similarity
 
 class GTSummarizer():
-    def __init__(self, controller=None, trainingData="./data/glove.6B.50d.txt"):
+    def __init__(self, controller=None, trainingData="./data/glove.42B.300d.txt"):
         # NLTK init
         nltk.download('punkt') # one time execution
         nltk.download('stopwords')
         self.stop_words = stopwords.words('english')
         self.trainingData = trainingData
         self.controller = controller
-
+        self.word_embeddings = self.getWordWeightVectors()
+        self.vector_size = 300;
+        
     def remove_stopwords(self, sen):
         sen_new = " ".join([i for i in sen if i not in self.stop_words])
         return sen_new
@@ -51,9 +53,9 @@ class GTSummarizer():
         sentence_vectors = []
         for i in sentences:
             if len(i) != 0:
-                v = sum([word_embeddings.get(w, np.zeros((50,))) for w in i.split()])/(len(i.split())+0.001)
+                v = sum([word_embeddings.get(w, np.zeros((self.vector_size,))) for w in i.split()])/(len(i.split())+0.001)
             else:
-                v = np.zeros((50,))
+                v = np.zeros((self.vector_size,))
             sentence_vectors.append(v)
         return sentence_vectors
 
@@ -64,7 +66,7 @@ class GTSummarizer():
         for i in range(len(sentences)):
             for j in range(len(sentences)):
                 if i != j:
-                    similarity_matrix[i][j] = cosine_similarity(sentence_vectors[i].reshape(1,50), sentence_vectors[j].reshape(1,50))[0,0]
+                    similarity_matrix[i][j] = cosine_similarity(sentence_vectors[i].reshape(1,self.vector_size), sentence_vectors[j].reshape(1,self.vector_size))[0,0]
         return similarity_matrix
 
     def getSummaryScores(self, similarity_matrix):
@@ -94,8 +96,7 @@ class GTSummarizer():
 
     def summarize_csv(self, fileName, textFieldName, topN=5):
         sentences = self.getSentences(self.readCSV(fileName, textFieldName))
-        word_embeddings = self.getWordWeightVectors()
-        sentence_vectors = self.getSentenceVectors(sentences, word_embeddings)
+        sentence_vectors = self.getSentenceVectors(sentences, self.word_embeddings)
         similarity_matrix = self.calculateSimilarityMatrix(sentences, sentence_vectors)
         scores = self.getSummaryScores(similarity_matrix)
         ranked_sentences = sorted(((scores[i],s) for i,s in enumerate(sentences)), reverse=True)
@@ -133,4 +134,4 @@ class GTSummarizer():
         return results
 
 # x = GTSummarizer()
-# x.summarize_csv("./data/tennis_articles_v4.csv", "article_text")
+# print(x.summarize_csv("./data/tennis_articles_v4.csv", "article_text"))
