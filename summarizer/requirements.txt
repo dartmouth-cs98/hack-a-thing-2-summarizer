@@ -30,7 +30,7 @@ python-dateutil==2.7.5
 python-engineio==3.2.3
 python-socketio==3.1.1
 pytz==2018.9
-requests==2.21.0
+requests==2.31.0
 s3transfer==0.1.13
 scikit-learn==0.20.2
 scipy==1.2.0
